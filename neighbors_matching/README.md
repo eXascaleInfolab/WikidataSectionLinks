@@ -5,7 +5,7 @@ Two preprocessing scripts (`preprocess_wikidata.py` and `preprocess_wikipedia.py
 ### preprocess_wikipedia.py
 Run locally. 
 
-**Input:** Wikipedia dump file in xml format (download from https://dumps.wikimedia.org, `{lang}wiki-latest-pages-articles.xml.bz2` file).
+**Input:** a Wikipedia dump file in xml format (download from https://dumps.wikimedia.org, `{lang}wiki-latest-pages-articles.xml.bz2` file).
 
 **Output:** a JSON file containing a Python dict, where each key is a Wikipedia page title and value – a list of its sections (excluding irrelevant sections like "notes", "see also", "references" etc.).  
 *Example*:  
@@ -39,9 +39,9 @@ Format: one entity per line, line format: `qid; label;;alias_1;;alias_2;;alias_3
 * sitelinks.{LANG} – sitelinks to {LANG}wiki  
 Format: one entity per line, line format: `qid; Wikipedia page title` 
 * wikidata_graph – a Wikidata graph represented with adjacency lists (each vertex contains references to its incoming and outgoing neighbors)  
-*Example:* `{"Q59840720": {"out": {"P21": \["Q6581072"], "P106": \["Q1650915"], "P31": \["Q5"]}, "in": {"P50": \["Q59836242"]}}}` (one entity per line).  
-**Note 1:** In this algorithm we don't consider neighbors which have more than 2 in/out edges of the same type, so those neighbors are filtered out on this step. For example, if an entity A has an outgoing edge of type "occupation" which links to an entity "singer", and 10 other enitities have this connection (`(X)-[occupation]->(singer)`), we discard "singer" from A's neighbors.  
-**Note 2:** We also filter out entities which are instances of Wikimedia service pages and some other undesirable types. A list of Wikimedia service pages was obtained with a SPARQL query and is provided in `wikimedia_project_pages.gz` file.
+*Example:* `{"Q59840720": {"out": {"P21": ["Q6581072"], "P106": ["Q1650915"], "P31": ["Q5"]}, "in": {"P50": ["Q59836242"]}}}` (one entity per line).  
+**Note 1:** In this algorithm we don't consider neighbors which have more than 2 in/out edges of the same type, so those neighbors are filtered out on this step. For example, if an entity A has an outgoing edge of type "occupation" which links to an entity "singer", and 10 other enitities have this link (`(X)-[occupation]->(singer)`), we discard "singer" from A's neighbors.  
+**Note 2:** We also filter out entities which are instances of Wikimedia service pages and some other undesirable types. A list of Wikimedia service pages was obtained with a SPARQL query and is provided in `wikimedia_project_pages.gz` file.  
 **Note 3:** Wikidata graph is common for all language, it doesn't have to be rebuilt every time a new language is processed.
 
 **How to run:** `spark-submit --master yarn --deploy-mode client preprocess_wikidata.py --lang LANG --dump <path to Wikidata dump file (HDFS)> --project-pages wikimedia_project_pages --output <path to folder where results will be saved> --graph --sitelinks --labels`  
